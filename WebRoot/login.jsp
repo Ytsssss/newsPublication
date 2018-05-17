@@ -68,7 +68,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			    	</div>
 				<%}%>
 					<div class="heading"><h2>登录</h2></div>
-					<form name="form1" id="ff1" method="post" action="/newspubsys/newspubsys?ac=frontlogin">
+					<form name="form1" id="ff1" method="post" action="/newspubsys?ac=frontlogin">
 						<div class="form-group">
 							<input type="text" class="form-control" placeholder="Username :" name="uname" id="uname" required>
 						</div>

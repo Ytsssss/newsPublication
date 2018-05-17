@@ -63,6 +63,42 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 			<div class="row">
 				<div class="col-md-6">
+					<div class="heading"><h2>好友请求</h2></div>
+					<%String userId = membersession.get("id").toString();
+					List<HashMap> friendMap = dao.select("select m.uname as name,m.id as id,f.create_time as time from friend f left join member m on f.user_id=m.id where f.friend_id="+userId+" and f.status=1");
+					if (friendMap.isEmpty() || friendMap == null){%>
+					<p>暂无好友请求</p>
+					<%}else {%>
+					<table class="table table-striped" width="100%">
+						<thead>
+							<tr>
+								<th>请求人</th>
+								<th>请求时间</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody>
+						<%for (HashMap friend : friendMap){%>
+						<tr>
+							<td>
+								<%=friend.get("name")%>
+							</td>
+							<td>
+								<%=friend.get("time")%>
+							</td>
+							<td>
+								<button type="button" class="btn btn-success" onclick="agree(<%=friend.get("id")%>,<%=userId%>,this)">同意</button>
+								<button type="button" class="btn btn-danger" onclick="disAgree(<%=friend.get("id")%>,<%=userId%>,this)">拒绝</button>
+							</td>
+						</tr>
+						<%}%>
+						</tbody>
+					</table>
+					<%}%>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
 					<div class="heading"><h2>个人资料</h2></div>
 					<form name="form2" id="ff2" method="post" action="/newspubsys/newspubsys?ac=memberinfo&id=<%=member.get("id") %>">
 						<%String suc = (String)request.getAttribute("suc");
@@ -119,7 +155,38 @@ function validatorpwd(){
 		$("#pwderroinfo").hide(); 
 	}
 }
+function agree(userId, friendId,obj) {
+    $.ajax({
+        type: "POST",
+        url: "/newspubsys?ac=confirmFriend", //servlet的名字
+        data: "userId="+userId+"&"+"friendId="+friendId,
+        success: function(data){
+            if(data=="true"){
+                alert("已添加对方为好友");
+                window.location.href="grinfo.jsp";
+            }else if (data=="false"){
+                alert("请登录后再添加好友");
+            }
+        }
+    });
 
+}
+function disAgree(userId, friendId,obj) {
+    $.ajax({
+        type: "POST",
+        url: "/newspubsys?ac=refuseFriend", //servlet的名字
+        data: "userId="+userId+"&"+"friendId="+friendId,
+        success: function(data){
+            if(data=="true"){
+                alert("已拒绝添加对方为好友");
+                window.location.href="grinfo.jsp";
+            }else if (data=="false"){
+                alert("请登录后再添加好友");
+            }
+        }
+    });
+
+}
 </script>
 </body>
 </html>

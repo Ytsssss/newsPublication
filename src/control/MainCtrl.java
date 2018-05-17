@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.SocketException;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
 import java.util.*;
 
 import javax.servlet.ServletException;
@@ -578,11 +579,11 @@ public class MainCtrl extends HttpServlet {
 		if (ac.equals("follow")){
 			String userId = request.getParameter("userId");
 			String followId = request.getParameter("followId");
-			if (userId == null){
+			if (userId.equals("0")){
 				out.print("false");
 			}else {
-				Date createTime = new Date();
-				Date updateTime = new Date();
+				Timestamp createTime=new Timestamp(new Date().getTime());
+				Timestamp updateTime=new Timestamp(new Date().getTime());
 				dao.commOper("insert into follow (user_id,follow_id,create_time,update_time) " +
 						"values('"+userId+"','"+followId+"','"+createTime+"','"+updateTime+"')");
 				out.print("true");
@@ -596,7 +597,7 @@ public class MainCtrl extends HttpServlet {
 			if (userId == null){
 				out.print("false");
 			}else {
-				dao.commOper("delete from follow where user_id="+userId+"and follow_id="+followId);
+				dao.commOper("delete from follow where user_id="+userId+" and follow_id="+followId);
 				out.print("true");
 			}
 		}
@@ -605,11 +606,11 @@ public class MainCtrl extends HttpServlet {
 		if(ac.equals("addFriend")){
 			String userId = request.getParameter("userId");
 			String friendId = request.getParameter("friendId");
-			if (userId == null){
+			if (userId == null || userId.equals("0")){
 				out.print("false");
 			}else {
-				Date createTime = new Date();
-				Date updateTime = new Date();
+				Timestamp createTime=new Timestamp(new Date().getTime());
+				Timestamp updateTime=new Timestamp(new Date().getTime());
 				int status = 1;
 				dao.commOper("insert into friend (user_id,friend_id,status,create_time,update_time) " +
 						"values('"+userId+"','"+friendId+"','"+status+"','"+createTime+"','"+updateTime+"')");
@@ -624,11 +625,11 @@ public class MainCtrl extends HttpServlet {
 			if (userId == null){
 				out.print("false");
 			}else {
-				Date createTime = new Date();
-				Date updateTime = new Date();
+				Timestamp createTime=new Timestamp(new Date().getTime());
+				Timestamp updateTime=new Timestamp(new Date().getTime());
 				int status = 0;
-				dao.commOper("update friend set status="+status+",update_time="+updateTime+"where " +
-						"user_id="+userId+"and friend_id="+friendId);
+				dao.commOper("update friend set status="+status+" where " +
+						"user_id="+userId+" and friend_id="+friendId);
 				dao.commOper("insert into friend (user_id,friend_id,status,create_time,update_time) " +
 						"values('"+friendId+"','"+userId+"','"+status+"','"+createTime+"','"+updateTime+"')");
 				out.print("true");
@@ -642,7 +643,7 @@ public class MainCtrl extends HttpServlet {
 			if (userId == null){
 				out.print("false");
 			}else {
-				dao.commOper("delete from friend where user_id="+userId+"and friendI="+friendId);
+				dao.commOper("delete from friend where user_id="+userId+" and friend_id="+friendId);
 				out.print("true");
 			}
 		}

@@ -7,6 +7,9 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 %>
+<%!
+	boolean isFollow = false;
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,8 +69,21 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 			<div class="info">	
 				<h2><%=map.get("title") %></h2>
-				发布人：<%=membermap.get("tname")%>&nbsp;&nbsp;&nbsp;<%=map.get("savetime") %>
-				&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-success" onclick="follow()">关注</button><br/>
+				发布人：
+				<a href="otherHomePage.jsp?userId=<%=membermap.get("id")%>"> <%=membermap.get("tname")%></a>&nbsp;&nbsp;&nbsp;
+				<%=map.get("savetime") %>&nbsp;&nbsp;&nbsp;
+				<%if (membersession==null){%>
+					<button type="button" class="btn btn-success" onclick="follow(<%=membersession==null?"0":membersession.get("id")%>,<%=membermap.get("id")%>,this)">关注</button><br/>
+				<%}else{
+					String userId = membersession.get("id").toString();
+					String followId = membermap.get("id").toString();
+					List followMap = dao.select("select * from follow where user_id="+userId+" and follow_id="+followId);
+					if (followMap==null || followMap.isEmpty()){%>
+					<button id="followbtn1" type="button" class="btn btn-success" onclick="follow(<%=membersession==null?"0":membersession.get("id")%>,<%=membermap.get("id")%>,this)">关注</button><br/>
+					<%}else{%>
+					<button id="followbtn2" type="button" class="btn btn-default" onclick="follow(<%=membersession==null?"0":membersession.get("id")%>,<%=membermap.get("id")%>,this)">已关注</button><br/>
+				<%}%>
+				<%}%>
 				<img alt="" src="upfile/<%=map.get("filename") %>" width="700" height="400"><br/>
 				<%=map.get("note") %>
 			</div>
@@ -139,18 +155,53 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	<jsp:include page="foot.jsp"></jsp:include>
 
 	<script type="text/javascript">
-        function follow(){
-            var userId = membersession.get("id");
-            var followId = membermap.get("id");
+        function follow(userId, followId,obj){
+            if (obj.id == "followbtn1"){
+                $.ajax({
+                    type: "POST",
+                    url: "/newspubsys?ac=follow", //servlet的名字
+                    data: "userId="+userId+"&"+"followId="+followId,
+                    success: function(data){
+                        if(data=="true"){
+                            $("#followbtn1").html("已关注");
+                            obj.className="btn btn-default";
+                            obj.id = "followbtn2";
+                            alert("关注成功");
+                        }else if (data=="false"){
+                            alert("请登录后再关注");
+                        }
+                    }
+                });
+			}else if (obj.id=="followbtn2"){
+                $.ajax({
+                    type: "POST",
+                    url: "/newspubsys?ac=unfollow", //servlet的名字
+                    data: "userId="+userId+"&"+"followId="+followId,
+                    success: function(data){
+                        if(data=="true"){
+                            $("#followbtn2").html("关注");
+                            obj.className="btn btn-success";
+                            obj.id = "followbtn1";
+                            alert("取消关注成功");
+                        }else if (data=="false"){
+                            alert("请登录后再取消关注");
+                        }
+                    }
+                });
+			}
+        }
+        function unfollow(userId, followId,obj){
             $.ajax({
                 type: "POST",
-                url: "/newspubsys/newspubsys?ac=follow", //servlet的名字
+                url: "/newspubsys?ac=unfollow", //servlet的名字
                 data: "userId="+userId+"&"+"followId="+followId,
                 success: function(data){
                     if(data=="true"){
-                        alert("关注成功");
+                        $("#followbtn2").html("关注");
+                        obj.className="btn btn-success";
+                        alert("取消关注成功");
                     }else if (data=="false"){
-                       	alert("请登录后再关注");
+                        alert("请登录后再取消关注");
                     }
                 }
             });
