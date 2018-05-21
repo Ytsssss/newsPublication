@@ -13,6 +13,7 @@ import java.net.SocketException;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.servlet.ServletException;
@@ -644,6 +645,25 @@ public class MainCtrl extends HttpServlet {
 				out.print("false");
 			}else {
 				dao.commOper("delete from friend where user_id="+userId+" and friend_id="+friendId);
+				out.print("true");
+			}
+		}
+
+		//回复评论
+		if(ac.equals("replyComment")){
+			String mid = request.getParameter("mid");
+			String newsid = request.getParameter("newsid");
+			String content = request.getParameter("context");
+			String replyName = request.getParameter("replyName");
+			String replyMId = request.getParameter("replyMId");
+			Date savetime = new Date();
+			SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String savaTime = sf.format(savetime);
+			if (mid == null){
+				out.print("false");
+			}else {
+				dao.commOper("insert into pl (mid,newsid,content,replyName,replyMId,savetime) " +
+						"values('"+mid+"','"+newsid+"','"+content+"','"+replyName+"','"+replyMId+"','"+savaTime+"')");
 				out.print("true");
 			}
 		}

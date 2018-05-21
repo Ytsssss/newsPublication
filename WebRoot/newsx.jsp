@@ -120,15 +120,32 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								    HashMap mmm = dao.select("select * from member where id="+pjmap.get("mid")).get(0);
 								    %>
 									<tr>  
-										<td><%=pjmap.get("content") %></td>  
-										<td><%=mmm.get("tname") %></td>
+										<td><%=pjmap.get("content") %></td>
+										<td><%if(pjmap.get("replyName")!=null&&!"".equals(pjmap.get("replyName"))){%>
+											<%=mmm.get("tname") %>回复了<%=pjmap.get("replyName")%>
+											<%}else { %>
+											<%=mmm.get("tname") %>
+											<%}%>
+										</td>
 										<td><%=pjmap.get("savetime") %></td>
-										<td>
-										<%if(membersession!=null&&membersession.get("id").equals(map.get("mid"))){%>
-											<a href="newsx.jsp?id=<%=id %>&did=<%=pjmap.get("id") %>">删除</a>
+										<td><%if(membersession!=null){%>
+											<button class="btn-link btn" type="button" onclick="replybtn(<%=pjmap.get("id")%>)">回复</button>
 										<%} %>
 										</td>
-									</tr>  
+										<td>
+											<%if(membersession!=null){%>
+											<div id="replyComment<%=pjmap.get("id")%>" style="display: none">
+												<input type="text" class="form-control" placeholder="评论" id="replycontent<%=pjmap.get("id")%>" required value="">
+												<button type="button" class="btn btn-default" onclick="reply(<%=pjmap.get("mid")%>,<%=membersession.get("id")%>,<%=id%>,'<%=mmm.get("tname")%>',<%=pjmap.get("id")%>)">提交</button>
+											</div></td>
+											<%} %>
+										<td>
+										<%if(membersession!=null&&membersession.get("id").equals(map.get("mid"))){%>
+											<a href="newsx.jsp?id=<%=id %>&did=<%=pjmap.get("id") %>" style="margin-left: 20px;">删除</a>
+										<%} %>
+										</td>
+									</tr>
+
 									<%} %>
 									<tr>
 										<td colspan="9">${page.info }</td>
@@ -189,6 +206,33 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                     }
                 });
 			}
+        }
+        function reply(replyMId,mid,newsid,replyName,commentId) {
+			var context = document.getElementById("replycontent"+commentId).value;
+            $.ajax({
+                type: "POST",
+                url: "/newspubsys?ac=replyComment", //servlet的名字
+                data: "replyMId="+replyMId+"&"+"mid="+mid+"&"+"newsid="+newsid+"&"+"replyName="+replyName+"&"+"context="+context,
+                success: function(data){
+                    if(data=="true"){
+                        alert("回复评论成功");
+                        window.location.href="newsx.jsp?id=<%=id %>";
+                    }else if (data=="false"){
+                        alert("请登录后再评论");
+                    }
+                }
+            });
+        }
+        var tag = false;
+        function replybtn(id) {
+			var div = document.getElementById("replyComment"+id);
+			if (tag){
+			    div.style.display = "flex";
+			    div.style.flexDirection = "raw";
+			}else {
+                div.style.display="none";
+            }
+            tag=!tag;
         }
         function unfollow(userId, followId,obj){
             $.ajax({
