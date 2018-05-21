@@ -62,7 +62,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			</div>
 			<div class="col-md-6">
 				<form class="form-search" action="searcha.jsp?f=f" method="post">  
-					<input type="text" placeholder="新闻标题..." class="input-medium search-query" id="key1" name="key1">  
+					<input type="text" placeholder="按标题/作者进行搜索..." class="input-medium search-query" id="key1" name="key1">
 					<button type="submit" class="btn"><span class="glyphicon glyphicon-search"></span></button>  
 				</form>
 			</div>

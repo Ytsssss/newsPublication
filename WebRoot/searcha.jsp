@@ -67,10 +67,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				<button type="button" class="close" data-dismiss="alert">×</button>	
 			</div>
 						<%
-			String sql = "select * from news where shstatus='通过'";
+			String sql = "select n.id as id,n.filename as filename,n.title as title, n.savetime as savetime, m.uname as uname from news n left join member m on n.mid=m.id where n.shstatus='通过'";
 			String url = "/newspubsys/search.jsp?1=1";
 			String key1 = request.getParameter("key1")==null?"":request.getParameter("key1");
-			
+
 			String f = request.getParameter("f");
 			if(f==null)
 			 {
@@ -78,7 +78,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			 }
 			 if(!key1.equals(""))
 			 {
-				 sql+=" and (title like'%"+key1+"%')";
+				 sql+=" and title like'%"+key1+"%' "+" or uname like'%"+key1+"%' ";
 			 	url+="&key1="+key1;
 			 }
 			 if(!key2.equals(""))
@@ -86,7 +86,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				 sql+=" and (type ='"+key2+"')";
 			 	url+="&key2="+key2;
 			 }
-			 sql += " order by id desc";
+			 sql += " order by n.id desc";
 			 System.out.println(sql);
 			PageManager pageManager = PageManager.getPage(url,10, request);
 		    pageManager.doList(sql);
@@ -103,6 +103,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<div class="col-md-9">
 						<div class="caption">
 							<div class="name"><h3><a href="newsx.jsp?id=<%=promap.get("id") %>"><%=promap.get("title") %></a></h3></div>
+						</div>
+						<div class="info">
+							<%=promap.get("uname") %>
 						</div>
 						<div class="info">	
 							<%=promap.get("savetime") %>

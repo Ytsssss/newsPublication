@@ -62,18 +62,18 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				<button type="button" class="close" data-dismiss="alert">×</button>	
 			</div>
 			<%
-			String sql = "select * from news where type='新闻' order by id desc";
+			String sql = "select n.id as id,n.title as title, n.savetime as savetime, m.uname as uname from news n left join member m on n.mid=m.id where n.type='新闻' order by n.id desc";
 			String url ="/newspubsys/news.jsp?1=1";
 			PageManager pageManager = PageManager.getPage(url,10, request);
 		    pageManager.doList(sql);
 		    PageManager bean= (PageManager)request.getAttribute("page");
 		    ArrayList<HashMap> newslist=(ArrayList)bean.getCollection();
-				for(HashMap newmap:newslist){ 
+				for(HashMap newmap:newslist){
 			%>
 				<div class="product well">
 					<div class="col-md-9">
 						<div class="caption">
-							<div class="name"><h3><a href="newsx.jsp?id=<%=newmap.get("id") %>"><%=newmap.get("title") %></a></h3>[<%=newmap.get("savetime") %>]</div>
+							<div class="name"><h3><a href="newsx.jsp?id=<%=newmap.get("id") %>"><%=newmap.get("title") %></a></h3>[<%=newmap.get("uname")%>] [<%=newmap.get("savetime") %>]</div>
 						</div>
 					</div>
 				</div>	
